@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Menu - FoodCraft{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Our Menu</h1>
+        <p>Fresh, delicious food made with care</p>
+    </div>
+</div>
+
+<div class="container menu-page">
+    <div class="category-filter">
+        <a href="{{ url_for('menu') }}" class="filter-btn {% if not selected_category %}active{% endif %}">All</a>
+        {% for cat in categories %}
+        <a href="{{ url_for('menu', category=cat.id) }}"
+           class="filter-btn {% if selected_category == cat.id %}active{% endif %}">
+            {{ cat.icon }} {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="items-grid" id="menu-items">
+        {% for item in items %}
+        <div class="item-card">
+            <div class="item-emoji">{{ item.image_emoji }}</div>
+            <div class="item-info">
+                <span class="item-category-tag">{{ item.category.name }}</span>
+                <h3 class="item-name">{{ item.name }}</h3>
+                <p class="item-description">{{ item.description }}</p>
+                <div class="item-footer">
+                    <span class="item-price">${{ "%.2f"|format(item.price) }}</span>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
+                        <span class="qty-display">1</span>
+                        <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                        <button class="btn btn-primary add-to-cart"
+                                data-item-id="{{ item.id }}"
+                                data-item-name="{{ item.name }}">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% if not items %}
+        <div class="empty-state">
+            <p>No items found in this category.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function changeQty(btn, delta) {
+    const controls = btn.parentElement;
+    const display = controls.querySelector('.qty-display');
+    let qty = parseInt(display.textContent) + delta;
+    if (qty < 1) qty = 1;
+    display.textContent = qty;
+}
+
+document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const itemId = parseInt(this.dataset.itemId);
+        const controls = this.parentElement;
+        const qtyDisplay = controls.querySelector('.qty-display');
+        const quantity = qtyDisplay ? parseInt(qtyDisplay.textContent) : 1;
+        addToCart(itemId, quantity, this);
+    });
+});
+</script>
+{% endblock %}

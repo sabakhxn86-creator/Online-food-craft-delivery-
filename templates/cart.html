@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Cart - FoodCraft{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Your Cart</h1>
+    </div>
+</div>
+
+<div class="container cart-page">
+    {% if cart_items %}
+    <div class="cart-layout">
+        <div class="cart-items">
+            {% for item in cart_items %}
+            <div class="cart-item" data-item-id="{{ item.id }}">
+                <div class="cart-item-emoji">{{ item.image_emoji }}</div>
+                <div class="cart-item-info">
+                    <h3>{{ item.name }}</h3>
+                    <p class="cart-item-price">${{ "%.2f"|format(item.price) }}</p>
+                </div>
+                <div class="cart-item-controls">
+                    <button class="qty-btn" onclick="updateCartQty({{ item.id }}, {{ item.quantity - 1 }})">−</button>
+                    <span class="qty-display">{{ item.quantity }}</span>
+                    <button class="qty-btn" onclick="updateCartQty({{ item.id }}, {{ item.quantity + 1 }})">+</button>
+                    <button class="remove-btn" onclick="removeFromCart({{ item.id }})">🗑️</button>
+                </div>
+                <div class="cart-item-subtotal">
+                    ${{ "%.2f"|format(item.price * item.quantity) }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+            <h2>Order Summary</h2>
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="cart-subtotal">${{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery Fee</span>
+                <span>$2.99</span>
+            </div>
+            <div class="summary-row total-row">
+                <span>Total</span>
+                <span id="cart-total">${{ "%.2f"|format(total + 2.99) }}</span>
+            </div>
+            <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-block">Proceed to Checkout</a>
+            <a href="{{ url_for('menu') }}" class="btn btn-outline btn-block mt-1">Continue Shopping</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <h2>Your cart is empty</h2>
+        <p>Add some delicious items to get started!</p>
+        <a href="{{ url_for('menu') }}" class="btn btn-primary">Browse Menu</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateCartQty(itemId, newQty) {
+    if (newQty < 1) {
+        removeFromCart(itemId);
+        return;
+    }
+    fetch('/api/cart/update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({item_id: itemId, quantity: newQty})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('cart-count').textContent = data.cart_count;
+            document.getElementById('cart-subtotal').textContent = '$' + data.total.toFixed(2);
+            document.getElementById('cart-total').textContent = '$' + (data.total + 2.99).toFixed(2);
+            const item = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+            if (item) {
+                item.querySelector('.qty-display').textContent = newQty;
+                const price = parseFloat(item.querySelector('.cart-item-price').textContent.replace('$',''));
+                item.querySelector('.cart-item-subtotal').textContent = '$' + (price * newQty).toFixed(2);
+            }
+        }
+    });
+}
+
+function removeFromCart(itemId) {
+    fetch('/api/cart/remove', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({item_id: itemId})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('cart-count').textContent = data.cart_count;
+            const item = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+            if (item) item.remove();
+            if (data.cart_count === 0) location.reload();
+            else {
+                document.getElementById('cart-subtotal').textContent = '$' + data.total.toFixed(2);
+                document.getElementById('cart-total').textContent = '$' + (data.total + 2.99).toFixed(2);
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

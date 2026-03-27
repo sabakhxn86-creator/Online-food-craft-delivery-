@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}FoodCraft - Delicious Food Delivered{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container hero-content">
+        <h1>Delicious Food,<br><span class="accent">Delivered Fast</span></h1>
+        <p>Order from the best local restaurants and get food delivered in minutes.</p>
+        <a href="{{ url_for('menu') }}" class="btn btn-primary btn-lg">Order Now</a>
+    </div>
+</section>
+
+<section class="categories-section">
+    <div class="container">
+        <h2 class="section-title">Browse Categories</h2>
+        <div class="categories-grid">
+            {% for cat in categories %}
+            <a href="{{ url_for('menu', category=cat.id) }}" class="category-card">
+                <span class="category-icon">{{ cat.icon }}</span>
+                <span class="category-name">{{ cat.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="featured-section">
+    <div class="container">
+        <h2 class="section-title">Featured Items</h2>
+        <div class="items-grid">
+            {% for item in featured_items %}
+            <div class="item-card">
+                <div class="item-emoji">{{ item.image_emoji }}</div>
+                <div class="item-info">
+                    <h3 class="item-name">{{ item.name }}</h3>
+                    <p class="item-description">{{ item.description }}</p>
+                    <div class="item-footer">
+                        <span class="item-price">${{ "%.2f"|format(item.price) }}</span>
+                        <button class="btn btn-primary add-to-cart"
+                                data-item-id="{{ item.id }}"
+                                data-item-name="{{ item.name }}">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-2">
+            <a href="{{ url_for('menu') }}" class="btn btn-outline">View Full Menu</a>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-icon">🔍</div>
+                <h3>Browse Menu</h3>
+                <p>Explore our wide selection of delicious meals</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">🛒</div>
+                <h3>Add to Cart</h3>
+                <p>Choose your favorites and customize your order</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">💳</div>
+                <h3>Checkout</h3>
+                <p>Secure and easy payment process</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">🚀</div>
+                <h3>Fast Delivery</h3>
+                <p>Get your food delivered right to your door</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

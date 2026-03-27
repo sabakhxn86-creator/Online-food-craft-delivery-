@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - FoodCraft{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Checkout</h1>
+    </div>
+</div>
+
+<div class="container checkout-page">
+    <div class="checkout-layout">
+        <form method="POST" class="checkout-form">
+            <h2>Delivery Information</h2>
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required placeholder="John Doe">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 234 567 8900">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address">Delivery Address *</label>
+                <textarea id="address" name="address" required rows="3"
+                          placeholder="123 Main Street, City, State, ZIP"></textarea>
+            </div>
+
+            <h2 class="mt-2">Payment</h2>
+            <div class="payment-placeholder">
+                <p>💳 Payment integration coming soon</p>
+                <p class="text-muted">This demo uses a simulated checkout flow.</p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg mt-2">
+                Place Order — ${{ "%.2f"|format(total + 2.99) }}
+            </button>
+        </form>
+
+        <div class="order-summary-panel">
+            <h2>Your Order</h2>
+            {% for item in cart_items %}
+            <div class="summary-item">
+                <span>{{ item.image_emoji }} {{ item.name }} × {{ item.quantity }}</span>
+                <span>${{ "%.2f"|format(item.price * item.quantity) }}</span>
+            </div>
+            {% endfor %}
+            <hr>
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>${{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery Fee</span>
+                <span>$2.99</span>
+            </div>
+            <div class="summary-row total-row">
+                <span>Total</span>
+                <span>${{ "%.2f"|format(total + 2.99) }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

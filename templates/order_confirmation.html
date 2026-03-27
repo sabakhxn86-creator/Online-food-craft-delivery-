@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed - FoodCraft{% endblock %}
+
+{% block content %}
+<div class="container confirmation-page">
+    <div class="confirmation-card">
+        <div class="confirmation-icon">✅</div>
+        <h1>Order Confirmed!</h1>
+        <p class="confirmation-sub">Thank you, <strong>{{ order.customer_name }}</strong>! Your order has been received.</p>
+
+        <div class="order-details">
+            <div class="detail-row">
+                <span>Order #</span>
+                <span><strong>{{ order.id }}</strong></span>
+            </div>
+            <div class="detail-row">
+                <span>Status</span>
+                <span class="status-badge">{{ order.status|title }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Delivery to</span>
+                <span>{{ order.delivery_address }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Total</span>
+                <span><strong>${{ "%.2f"|format(order.total_amount + 2.99) }}</strong></span>
+            </div>
+        </div>
+
+        <h3>Items Ordered</h3>
+        <div class="ordered-items">
+            {% for item in order.items %}
+            <div class="ordered-item">
+                <span>{{ item.menu_item.image_emoji }} {{ item.menu_item.name }} × {{ item.quantity }}</span>
+                <span>${{ "%.2f"|format(item.price * item.quantity) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="estimated-time">
+            <p>🕐 Estimated delivery time: <strong>30–45 minutes</strong></p>
+        </div>
+
+        <div class="confirmation-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+            <a href="{{ url_for('menu') }}" class="btn btn-outline">Order Again</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
